@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedido de Regente - Turma de Informática 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #040d1c;
+  --surface: rgba(255,255,255,0.04);
+  --border: rgba(99,179,255,0.18);
+  --blue: #4fa8ff;
+  --blue-bright: #7ec8ff;
+  --green: #3dffa0;
+  --text: #d6eaff;
+  --text-dim: rgba(214,234,255,0.5);
+  --danger: #ff5c5c;
+}
+
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Starfield */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 42% 8%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 68% 35%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 15%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 92% 60%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 75%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 90%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 10% 85%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 70%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 22% 50%, rgba(255,255,255,0.3) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Glow blob */
+body::after {
+  content: '';
+  position: fixed;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 500px;
+  background: radial-gradient(ellipse, rgba(79,168,255,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+canvas#confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* SCREENS */
+.screen {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 40px 24px;
+  display: flex;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(24px);
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.screen.active {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+}
+
+.screen.exit {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+/* CARD */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 48px 56px;
+  max-width: 680px;
+  width: 100%;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+  text-align: center;
+}
+
+/* TYPOGRAPHY */
+.label {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 20px;
+  opacity: 0.8;
+}
+
+h1 {
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #ffffff 30%, var(--blue-bright));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.highlight {
+  color: var(--blue-bright);
+  -webkit-text-fill-color: var(--blue-bright);
+}
+
+p {
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+
+p strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* BUTTONS */
+.btn-row {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 36px;
+}
+
+.btn {
+  padding: 14px 32px;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  letter-spacing: 0.3px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #2a7fff, #4fb8ff);
+  color: white;
+  box-shadow: 0 4px 20px rgba(79,168,255,0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(79,168,255,0.45);
+}
+
+.btn-danger {
+  position: fixed;
+  background: rgba(255,92,92,0.15);
+  color: var(--danger);
+  border: 1px solid rgba(255,92,92,0.35);
+  z-index: 50;
+  transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+}
+
+/* TERMINAL */
+.terminal {
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(61,255,160,0.2);
+  border-radius: 12px;
+  padding: 24px 28px;
+  text-align: left;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  line-height: 2;
+  margin: 24px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.terminal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(61,255,160,0.015) 2px,
+    rgba(61,255,160,0.015) 4px
+  );
+  pointer-events: none;
+}
+
+.terminal .line {
+  color: var(--text-dim);
+  opacity: 0;
+  animation: typeLine 0.3s forwards;
+}
+
+.terminal .line:nth-child(1) { animation-delay: 0.1s; }
+.terminal .line:nth-child(2) { animation-delay: 0.4s; }
+.terminal .line:nth-child(3) { animation-delay: 0.9s; }
+.terminal .line:nth-child(4) { animation-delay: 1.3s; }
+.terminal .line:nth-child(5) { animation-delay: 1.7s; }
+.terminal .line:nth-child(6) { animation-delay: 2.1s; }
+.terminal .line:nth-child(7) { animation-delay: 2.5s; }
+.terminal .line:nth-child(8) { animation-delay: 2.9s; }
+.terminal .line:nth-child(9) { animation-delay: 3.3s; }
+
+@keyframes typeLine {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.terminal .ok  { color: var(--green); }
+.terminal .cmd { color: var(--blue); }
+
+/* DIVIDER */
+.divider {
+  width: 48px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--blue), transparent);
+  margin: 20px auto;
+  border-radius: 2px;
+}
+
+/* SUCCESS */
+.success-box {
+  max-height: 0;
+  overflow: hidden;
+  margin-top: 0;
+  opacity: 0;
+  padding: 0 28px;
+  border-radius: 14px;
+  background: rgba(61,255,160,0.06);
+  border: 1px solid rgba(61,255,160,0.0);
+  transition: max-height 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.5s ease 0.15s,
+              margin-top 0.5s ease,
+              padding 0.4s ease,
+              border-color 0.5s ease 0.2s;
+}
+
+.success-box.visible {
+  max-height: 200px;
+  opacity: 1;
+  margin-top: 32px;
+  padding: 28px;
+  border-color: rgba(61,255,160,0.2);
+}
+
+.success-box h2 {
+  font-size: 22px;
+  color: var(--green);
+  margin-bottom: 10px;
+}
+
+.success-box p {
+  font-size: 18px;
+  color: var(--text);
+}
+
+/* DOTS INDICATOR */
+.dots {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.3s, transform 0.3s;
+}
+
+.dot.active {
+  background: var(--blue);
+  transform: scale(1.3);
+}
+
+</style>
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+
+<!-- Botão Não flutuante — fora de qualquer tela -->
+<button class="btn btn-danger" id="naoBtn" style="display:none;" onclick="escaparNao()">Não</button>
+
+<!-- TELA 1 -->
+<div class="screen active" id="tela1">
+  <div class="dots">
+    <div class="dot active" id="d1"></div>
+    <div class="dot" id="d2"></div>
+    <div class="dot" id="d3"></div>
+    <div class="dot" id="d4"></div>
+  </div>
+  <div class="card">
+    <div class="label">Turma de Informática · 2026</div>
+    <h1>Inicializando<br>sistema...</h1>
+    <div class="divider"></div>
+    <p>Carregando turma de Informática 2026...</p>
+    <p>Preparando <strong>mensagem especial</strong>...</p>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="next(2)">Iniciar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TELA 2 -->
+<div class="screen" id="tela2">
+  <div class="dots">
+    <div class="dot" id="d1b"></div>
+    <div class="dot active" id="d2b"></div>
+    <div class="dot" id="d3b"></div>
+    <div class="dot" id="d4b"></div>
+  </div>
+  <div class="card">
+    <div class="label">Uma mensagem da turma</div>
+    <h1>Professor <span class="highlight">Bigas</span></h1>
+    <div class="divider"></div>
+    <p>Durante esse curso aprendemos muito mais que informática.</p>
+    <p>Aprendemos lógica, <strong>persistência</strong> quando o código não funcionava — e a importância de ter um professor que realmente inspira seus alunos.</p>
+    <p>E nisso tivemos muita sorte...</p>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="next(3)">Continuar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TELA 3 -->
+<div class="screen" id="tela3">
+  <div class="dots">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot active"></div>
+    <div class="dot"></div>
+  </div>
+  <div class="card">
+    <div class="label">Análise em andamento</div>
+    <h1>Executando<br>análise...</h1>
+    <div class="terminal">
+      <div class="line"><span class="cmd">&gt;</span> procurando regente ideal...</div>
+      <div class="line"><span class="cmd">&gt;</span> analisando requisitos...</div>
+      <div class="line"> </div>
+      <div class="line"><span class="ok">✔</span> professor dedicado</div>
+      <div class="line"><span class="ok">✔</span> inspira alunos</div>
+      <div class="line"><span class="ok">✔</span> paciência com nossos códigos</div>
+      <div class="line"><span class="ok">✔</span> faz parte da nossa história</div>
+      <div class="line"> </div>
+      <div class="line"><span class="ok">→</span> resultado encontrado...</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="next(4)">Ver resultado →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TELA 4 -->
+<div class="screen" id="tela4">
+  <div class="dots">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot active"></div>
+  </div>
+  <div class="card">
+    <div class="label">Resultado</div>
+    <h1>Professor <span class="highlight">Bigas</span></h1>
+    <div class="divider"></div>
+    <p style="font-size:19px; color: var(--text);">Você aceita ser o <strong>regente da nossa turma<br>de Informática 2026?</strong></p>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="aceitou()">✓ Sim, eu aceito!</button>
+    </div>
+    <div class="success-box" id="resposta">
+      <h2>🎉 Pedido aceito com sucesso!</h2>
+      <p>Agora olhe para trás... 👀</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const naoBtn = document.getElementById("naoBtn");
+
+// Smooth screen transitions
+function next(n) {
+  const current = document.querySelector(".screen.active");
+  const target = document.getElementById("tela" + n);
+
+  if (current) {
+    current.classList.add("exit");
+    current.classList.remove("active");
+    setTimeout(() => current.classList.remove("exit"), 550);
+  }
+
+  setTimeout(() => {
+    target.classList.add("active");
+
+    // Show/hide naoBtn depending on screen
+    if (n === 4) {
+      posicionarNaoBtn();
+      naoBtn.style.display = "block";
+      naoBtn.style.opacity = "0";
+      setTimeout(() => { naoBtn.style.opacity = "1"; }, 300);
+    } else {
+      naoBtn.style.display = "none";
+    }
+  }, current ? 80 : 0);
+
+  // Re-trigger terminal animation
+  if (n === 3) {
+    setTimeout(() => {
+      const t = document.querySelector(".terminal");
+      if (t) {
+        const clone = t.cloneNode(true);
+        t.parentNode.replaceChild(clone, t);
+      }
+    }, 200);
+  }
+}
+
+// Posiciona o "Não" ao lado do "Sim" na tela 4
+function posicionarNaoBtn() {
+  const simBtn = document.querySelector("#tela4 .btn-primary");
+  if (!simBtn) return;
+  const rect = simBtn.getBoundingClientRect();
+  naoBtn.style.top  = (rect.top + window.scrollY) + "px";
+  naoBtn.style.left = (rect.right + window.scrollX + 14) + "px";
+}
+
+// Ao clicar, pula para posição aleatória — mas nunca sai da tela
+function escaparNao() {
+  const w = naoBtn.offsetWidth;
+  const h = naoBtn.offsetHeight;
+  const pad = 20;
+  const newX = pad + Math.random() * (window.innerWidth  - w - pad * 2);
+  const newY = pad + Math.random() * (window.innerHeight - h - pad * 2);
+  naoBtn.style.left = newX + "px";
+  naoBtn.style.top  = newY + "px";
+}
+
+function aceitou() {
+  // Fade out naoBtn sem remover
+  naoBtn.style.transition += ", opacity 0.4s ease";
+  naoBtn.style.opacity = "0";
+  setTimeout(() => { naoBtn.style.display = "none"; }, 400);
+
+  document.querySelector("#tela4 .btn-primary").style.opacity = "0";
+  document.querySelector("#tela4 .btn-primary").style.pointerEvents = "none";
+
+  setTimeout(() => {
+    document.getElementById("resposta").classList.add("visible");
+  }, 200);
+
+  startConfetti();
+}
+
+// Confetti
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener("resize", () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+let pieces = [];
+const colors = ["#4fa8ff","#7ec8ff","#3dffa0","#ffffff","#ffd94f","#ff8afb"];
+
+function startConfetti() {
+  pieces = [];
+  for (let i = 0; i < 220; i++) {
+    pieces.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      r: Math.random() * 7 + 3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      speed: Math.random() * 2.5 + 1.5,
+      wobble: Math.random() * 0.06,
+      wobbleOffset: Math.random() * Math.PI * 2,
+      shape: Math.random() > 0.5 ? "circle" : "rect",
+      rotation: Math.random() * Math.PI,
+      rotSpeed: (Math.random() - 0.5) * 0.08
+    });
+  }
+  animateConfetti();
+}
+
+function animateConfetti() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  pieces.forEach(p => {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = 0.85;
+    if (p.shape === "circle") {
+      ctx.beginPath();
+      ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r);
+    }
+    ctx.restore();
+    p.y += p.speed;
+    p.x += Math.sin(p.wobbleOffset) * 1.2;
+    p.wobbleOffset += p.wobble;
+    p.rotation += p.rotSpeed;
+    if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
+  });
+  requestAnimationFrame(animateConfetti);
+}
+</script>
+</body>
+</html>
