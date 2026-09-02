@@ -97,6 +97,7 @@
   #slide-4 { background: radial-gradient(ellipse at 30% 70%, #2a0a1a 0%, var(--darker) 70%); }
   #slide-5 { background: radial-gradient(ellipse at 70% 40%, #0a2a1a 0%, var(--darker) 70%); }
   #slide-6 { background: radial-gradient(ellipse at 50% 50%, #1a1a00 0%, var(--darker) 70%); }
+  #slide-7 { background: radial-gradient(ellipse at 50% 30%, #1a001a 0%, var(--darker) 70%); }
 
   /* ---- DIVIDERS ---- */
   .divider {
@@ -655,6 +656,85 @@
     color: var(--gray);
   }
 
+  /* ---- LYRIC BALLOON ---- */
+  .balloon-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0;
+  }
+  .balloon {
+    position: relative;
+    background: linear-gradient(135deg, rgba(233,30,99,0.08), rgba(0,229,255,0.06));
+    border: 2px solid rgba(233,30,99,0.35);
+    border-radius: 24px;
+    padding: 35px 40px;
+    max-width: 820px;
+    width: 100%;
+    box-shadow: 0 0 50px rgba(233,30,99,0.12), inset 0 0 40px rgba(0,229,255,0.03);
+  }
+  .balloon::after {
+    content: '';
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 30px;
+    height: 30px;
+    background: rgba(10,10,10,0.92);
+    border-right: 2px solid rgba(233,30,99,0.35);
+    border-bottom: 2px solid rgba(233,30,99,0.35);
+    border-radius: 0 0 8px 0;
+  }
+  .balloon-title {
+    text-align: center;
+    font-family: 'Black Ops One', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 6px;
+  }
+  .balloon-sub {
+    text-align: center;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: var(--gray);
+    margin-bottom: 30px;
+    text-transform: uppercase;
+  }
+  .lyric-line {
+    display: flex;
+    gap: 20px;
+    padding: 9px 0;
+    border-bottom: 1px dashed rgba(255,255,255,0.06);
+  }
+  .lyric-line:last-child { border-bottom: none; }
+  .lyric-en {
+    flex: 1;
+    font-style: italic;
+    color: #bbb;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .lyric-pt {
+    flex: 1;
+    color: var(--white);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .lyric-label {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--pink);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  @media (max-width: 768px) {
+    .balloon { padding: 25px 20px; }
+    .lyric-line { flex-direction: column; gap: 4px; }
+  }
+
   /* ---- SPECTRUM ANIMATION ---- */
   .spectrum {
     display: flex;
@@ -690,6 +770,7 @@
   <div class="nav-dot" data-slide="4"><span class="tooltip">Como é Feito</span></div>
   <div class="nav-dot" data-slide="5"><span class="tooltip">Trecho</span></div>
   <div class="nav-dot" data-slide="6"><span class="tooltip">Tropicalismo</span></div>
+  <div class="nav-dot" data-slide="7"><span class="tooltip">Letra Traduzida</span></div>
 </nav>
 
 <!-- ===== SLIDE 0: HERO ===== -->
@@ -1060,6 +1141,95 @@
       </div>
       <p style="font-family:'Black Ops One',sans-serif;font-size:0.9rem;letter-spacing:4px;color:var(--gray);">FIM DA APRESENTAÇÃO</p>
       <p style="font-size:0.75rem;color:#444;margin-top:8px;letter-spacing:2px;">PINK FLOYD &bull; ROGER WATERS &bull; WELCOME TO THE MACHINE</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 7: LETRA TRADUZIDA ===== -->
+<section class="slide" id="slide-7">
+  <div class="wall-pattern"></div>
+  <div class="slide-inner">
+    <p class="subtitle">07</p>
+    <h2 class="section-title">A Letra Traduzida</h2>
+    <p class="subtitle" style="color:var(--cyan);">Welcome to the Machine &bull; pt-BR</p>
+
+    <div class="balloon-wrap">
+      <div class="balloon">
+        <div class="balloon-title">Bem-Vindo à Máquina</div>
+        <div class="balloon-sub">Verso traduzido &bull; lado a lado</div>
+
+        <div class="lyric-line">
+          <div class="lyric-en">
+            <div class="lyric-label">Original</div>
+            Welcome my son, welcome to the machine.<br>
+            Where have you been? It's alright, we know where you've been.
+          </div>
+          <div class="lyric-pt">
+            <div class="lyric-label" style="color:var(--cyan);">Tradução</div>
+            Bem-vindo, meu filho, bem-vindo à máquina.<br>
+            Onde você esteve? Tudo bem, nós sabemos onde você esteve.
+          </div>
+        </div>
+
+        <div class="lyric-line">
+          <div class="lyric-en">
+            You've been in the pipeline, filling in time,<br>
+            provided with toys and scouting for boys.
+          </div>
+          <div class="lyric-pt">
+            Você esteve na linha de produção, preenchendo o tempo,<br>
+            munido de brinquedos e à caça de garotos.
+          </div>
+        </div>
+
+        <div class="lyric-line">
+          <div class="lyric-en">
+            You bought a guitar to punish your ma,<br>
+            you didn't like school, and you know you're nobody's fool.
+          </div>
+          <div class="lyric-pt">
+            Você comprou uma guitarra para castigar sua mãe,<br>
+            você não gostava da escola e sabe que não é bobo de ninguém.
+          </div>
+        </div>
+
+        <div class="lyric-line">
+          <div class="lyric-en">
+            So welcome to the machine.
+          </div>
+          <div class="lyric-pt">
+            Então, bem-vindo à máquina.
+          </div>
+        </div>
+
+        <div class="lyric-line">
+          <div class="lyric-en">
+            What did you dream? It's alright, we told you what to dream.<br>
+            You dreamed of a big star, he plays a mean guitar,<br>
+            he always eats in the Steak Bar.
+          </div>
+          <div class="lyric-pt">
+            O que você sonhou? Tudo bem, nós dissemos a você o que sonhar.<br>
+            Você sonhou com uma grande estrela, ele toca uma guitarra impressionante,<br>
+            ele sempre come no Steak Bar.
+          </div>
+        </div>
+
+        <div class="lyric-line">
+          <div class="lyric-en">
+            He loved to drive in his Jaguar,<br>
+            so welcome to the machine.
+          </div>
+          <div class="lyric-pt">
+            Ele adorava dirigir seu Jaguar,<br>
+            então, bem-vindo à máquina.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-block" style="text-align:center;">
+      A máquina já sabia o seu sonho antes mesmo de você o ter sonhado.
     </div>
   </div>
 </section>
